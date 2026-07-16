@@ -85,6 +85,7 @@ export default function SnakeGame() {
   const timerRef = useRef<number | null>(null);
   const gameOverTimerRef = useRef<number | null>(null);  // 追踪结束画面延迟绘制的 timeout
   const speedRef = useRef(INITIAL_SPEED);
+  const tickRef = useRef<() => void>(() => {});          // 始终指向最新版 tick，避免闭包陈旧问题
 
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -283,9 +284,12 @@ export default function SnakeGame() {
     snakeRef.current = newSnake;
     draw();
 
-    // 设置下一次 tick（用最新速度）
-    timerRef.current = window.setTimeout(tick, speedRef.current);
+    // 设置下一次 tick（用最新速度），通过 ref 确保始终调用最新版 tick
+    timerRef.current = window.setTimeout(() => tickRef.current(), speedRef.current);
   }, [draw]);
+
+  // 始终保持 tickRef 指向最新的 tick，防止 togglePause 等函数捕获陈旧闭包
+  tickRef.current = tick;
 
   // ========== 游戏结束 ==========
 
@@ -345,7 +349,7 @@ export default function SnakeGame() {
     }
 
     draw();
-    timerRef.current = window.setTimeout(tick, INITIAL_SPEED);
+    timerRef.current = window.setTimeout(() => tickRef.current(), INITIAL_SPEED);
   }
 
   // ========== 暂停 / 继续 ==========
@@ -356,7 +360,7 @@ export default function SnakeGame() {
     if (paused) {
       // 继续
       setPaused(false);
-      timerRef.current = window.setTimeout(tick, speedRef.current);
+      timerRef.current = window.setTimeout(() => tickRef.current(), speedRef.current);
     } else {
       // 暂停
       setPaused(true);
