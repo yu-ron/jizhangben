@@ -5,6 +5,7 @@ const navItems = [
   { to: '/records', label: '账单', icon: '📋' },
   { to: '/statistics', label: '统计', icon: '📊' },
   { to: '/settings', label: '设置', icon: '⚙️' },
+  { to: '/snake', label: '贪吃蛇', icon: '🐍' },
 ];
 
 export default function Layout() {
