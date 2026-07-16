@@ -36,14 +36,32 @@ interface Point {
 /** 生成随机食物位置，不能和蛇身重叠 */
 function randomFood(snake: Point[]): Point {
   const occupied = new Set(snake.map(p => `${p.x},${p.y}`));
-  let point: Point;
-  do {
-    point = {
+  const maxAttempts = 1000; // 防止蛇太长时无限循环
+  let attempts = 0;
+
+  // 先随机尝试
+  while (attempts < maxAttempts) {
+    const point: Point = {
       x: Math.floor(Math.random() * GRID_SIZE),
       y: Math.floor(Math.random() * GRID_SIZE),
     };
-  } while (occupied.has(`${point.x},${point.y}`));
-  return point;
+    if (!occupied.has(`${point.x},${point.y}`)) {
+      return point;
+    }
+    attempts++;
+  }
+
+  // 随机失败太多次 → 兜底：遍历整个网格，收集所有空格子再随机选
+  const empty: Point[] = [];
+  for (let x = 0; x < GRID_SIZE; x++) {
+    for (let y = 0; y < GRID_SIZE; y++) {
+      if (!occupied.has(`${x},${y}`)) {
+        empty.push({ x, y });
+      }
+    }
+  }
+  // 如果棋盘完全满了（理论上不应该发生），返回 (0,0) 作为最后兜底
+  return empty.length > 0 ? empty[Math.floor(Math.random() * empty.length)] : { x: 0, y: 0 };
 }
 
 /** 初始蛇：中间偏左，长度 3 */
@@ -65,6 +83,7 @@ export default function SnakeGame() {
   const dirRef = useRef<{ x: number; y: number }>({ x: 1, y: 0 }); // 当前方向
   const nextDirRef = useRef<{ x: number; y: number }>({ x: 1, y: 0 }); // 缓冲方向（防止一帧内多次转向）
   const timerRef = useRef<number | null>(null);
+  const gameOverTimerRef = useRef<number | null>(null);  // 追踪结束画面延迟绘制的 timeout
   const speedRef = useRef(INITIAL_SPEED);
 
   const [score, setScore] = useState(0);
@@ -280,7 +299,12 @@ export default function SnakeGame() {
   }
 
   function drawGameOver() {
-    setTimeout(() => {
+    // 清除上一次未执行的结束画面（防止多次调用叠加）
+    if (gameOverTimerRef.current !== null) {
+      clearTimeout(gameOverTimerRef.current);
+    }
+    gameOverTimerRef.current = window.setTimeout(() => {
+      gameOverTimerRef.current = null;
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -311,9 +335,13 @@ export default function SnakeGame() {
     setPaused(false);
     setStarted(true);
 
-    // 清空旧定时器
+    // 清空旧定时器（游戏循环 + 结束画面延迟绘制）
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
+    }
+    if (gameOverTimerRef.current !== null) {
+      clearTimeout(gameOverTimerRef.current);
+      gameOverTimerRef.current = null;
     }
 
     draw();
@@ -384,10 +412,14 @@ export default function SnakeGame() {
     const dy = t.clientY - touchStartRef.current.y;
     touchStartRef.current = null;
 
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+    const minSwipe = 20; // 最小滑动距离（像素），过滤手指微动
+
     // 判断滑动方向（取绝对值大的方向）
-    if (Math.abs(dx) > Math.abs(dy)) {
+    if (absDx > absDy && absDx >= minSwipe) {
       nextDirRef.current = dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 };
-    } else if (Math.abs(dy) > Math.abs(dx)) {
+    } else if (absDy > absDx && absDy >= minSwipe) {
       nextDirRef.current = dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 };
     }
   }
@@ -398,6 +430,9 @@ export default function SnakeGame() {
     return () => {
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current);
+      }
+      if (gameOverTimerRef.current !== null) {
+        clearTimeout(gameOverTimerRef.current);
       }
     };
   }, []);
