@@ -1,12 +1,18 @@
 import { useMemo } from 'react';
 import { useApp } from '../store/AppContext';
 
+/**
+ * 预算进度条——展示当月支出占预算的百分比
+ * 颜色根据使用比例动态变化：≤50% 蓝色、50%-80% 黄色、>80% 红色（超支预警）
+ */
 export default function BudgetBar() {
   const { budget, getMonthExpense, currentMonth } = useApp();
 
   const expense = useMemo(() => getMonthExpense(currentMonth), [getMonthExpense, currentMonth]);
+  // 只有当前月份的预算才有效，历史月份显示 0
   const budgetAmount = budget.month === currentMonth ? budget.amount : 0;
 
+  // 计算使用百分比，expense 超过 budget 时最多显示 100%
   const percent = budgetAmount > 0 ? Math.min((expense / budgetAmount) * 100, 100) : 0;
   const remaining = budgetAmount - expense;
 
@@ -22,6 +28,7 @@ export default function BudgetBar() {
     );
   }
 
+  // 动态颜色：超 80% 红色（超支预警）、50%-80% 黄色（注意）、<50% 蓝色（正常）
   const barColor = percent > 80 ? 'bg-red-500' : percent > 50 ? 'bg-yellow-500' : 'bg-primary-500';
 
   return (

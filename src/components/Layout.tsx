@@ -8,6 +8,10 @@ const navItems = [
   { to: '/snake', label: '贪吃蛇', icon: '🐍' },
 ];
 
+/**
+ * 应用主布局——底部固定导航栏 + 内容区
+ * 底部 5 个 tab：首页、账单、统计、设置、贪吃蛇
+ */
 export default function Layout() {
   return (
     <div className="min-h-screen pb-20 bg-gray-50">

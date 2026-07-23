@@ -3,6 +3,9 @@ import { useApp } from '../store/AppContext';
 import AddRecordModal from '../components/AddRecordModal';
 import BudgetBar from '../components/BudgetBar';
 
+/**
+ * 首页仪表盘——月度收支概览卡片 + 预算进度条 + "记一笔"快捷按钮 + 最近 5 条记录
+ */
 export default function Home() {
   const { currentMonth, getMonthIncome, getMonthExpense, budget, records } = useApp();
   const [showModal, setShowModal] = useState(false);
@@ -77,6 +80,7 @@ export default function Home() {
   );
 }
 
+/** 最近记录列表——按日期倒序展示最近 5 条，支持删除 */
 function RecentRecords() {
   const { records, categories, deleteRecord } = useApp();
 

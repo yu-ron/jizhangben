@@ -4,6 +4,9 @@ import type { Category } from '../utils/storage';
 
 const ICON_OPTIONS = ['🍜', '🚗', '🛒', '🎮', '🏠', '📱', '💊', '📚', '🧴', '💸', '💰', '🧧', '📈', '💼', '📥', '🎁', '✈️', '🐱', '☕', '🏥'];
 
+/**
+ * 设置页——月度预算设置 + 支出/收入分类管理（增删）
+ */
 export default function Settings() {
   const { categories, addCategory, deleteCategory, budget, setBudget } = useApp();
 
@@ -172,6 +175,7 @@ export default function Settings() {
   );
 }
 
+/** 分类行组件——显示图标 + 名称 + 删除按钮 */
 function CategoryRow({ category, onDelete }: { category: Category; onDelete: (id: string) => void }) {
   return (
     <div className="flex items-center justify-between px-4 py-3 hover:bg-gray-50">

@@ -6,6 +6,7 @@ import Statistics from './pages/Statistics';
 import Settings from './pages/Settings';
 import SnakeGame from './pages/SnakeGame';
 
+/** 应用根组件——配置路由：首页、账单、统计、设置、贪吃蛇 5 个页面 */
 export default function App() {
   return (
     <Routes>

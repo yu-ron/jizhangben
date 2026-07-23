@@ -3,6 +3,9 @@ import { useApp } from '../store/AppContext';
 import AddRecordModal from '../components/AddRecordModal';
 import MonthPicker from '../components/MonthPicker';
 
+/**
+ * 账单列表页——按月份筛选、按日期分组展示（含每日小计）、支持删除记录
+ */
 export default function Records() {
   const { records, categories, currentMonth, setCurrentMonth, deleteRecord } = useApp();
   const [showModal, setShowModal] = useState(false);
@@ -33,6 +36,7 @@ export default function Records() {
 
   const getCatById = (id: string) => categories.find(c => c.id === id);
 
+  /** 将日期字符串转为中文星期几 */
   const weekDay = (dateStr: string) => {
     const d = new Date(dateStr);
     return ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][d.getDay()];

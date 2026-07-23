@@ -3,6 +3,9 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 import { useApp } from '../store/AppContext';
 import MonthPicker from '../components/MonthPicker';
 
+/**
+ * 统计图表页——当月汇总 + 分类支出饼图 + 近 6 月收支趋势柱状图
+ */
 export default function Statistics() {
   const { currentMonth, setCurrentMonth, getCategoryExpenseData, getMonthTrend, getMonthIncome, getMonthExpense } = useApp();
   const [chartType, setChartType] = useState<'pie' | 'bar'>('pie');
@@ -11,7 +14,7 @@ export default function Statistics() {
   const income = useMemo(() => getMonthIncome(currentMonth), [getMonthIncome, currentMonth]);
   const expense = useMemo(() => getMonthExpense(currentMonth), [getMonthExpense, currentMonth]);
 
-  // 最近6个月趋势
+  /** 生成最近 6 个月的月份列表（含当前月），从早到晚排列，用于柱状图 X 轴 */
   const trendMonths = useMemo(() => {
     const months: string[] = [];
     const [y, m] = currentMonth.split('-').map(Number);

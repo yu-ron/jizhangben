@@ -8,6 +8,11 @@ interface Props {
   onClose: () => void;
 }
 
+/**
+ * "记一笔"弹窗——弹出式表单，支持选择收入/支出、金额、分类、日期、备注
+ * @param open - 是否显示弹窗
+ * @param onClose - 关闭弹窗的回调
+ */
 export default function AddRecordModal({ open, onClose }: Props) {
   const { categories, addRecord, currentMonth } = useApp();
 
@@ -22,11 +27,12 @@ export default function AddRecordModal({ open, onClose }: Props) {
 
   const filteredCategories = categories.filter(c => c.type === type);
 
+  /** 提交记账记录：校验必填项（金额 > 0、分类已选、日期已填）后写入，并重置表单 */
   const handleSubmit = () => {
     const amt = parseFloat(amount);
-    if (!amt || amt <= 0) return;
-    if (!categoryId) return;
-    if (!date) return;
+    if (!amt || amt <= 0) return;    // 金额必须大于 0
+    if (!categoryId) return;          // 必须选择分类
+    if (!date) return;                // 必须选择日期
 
     addRecord({
       amount: amt,
