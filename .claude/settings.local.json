@@ -3,9 +3,39 @@
     "allow": [
       "Bash(npm create *)",
       "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npx *)",
       "Bash(git add *)",
-      "Bash(git commit -m '初始提交：记账本 Web 应用 *)",
-      "Bash(git config *)"
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git config *)",
+      "Bash(rm -f .claude/*.txt)",
+      "Bash(mkdir -p .claude)",
+      "Bash(cat .claude/*.txt)",
+      "Bash(grep *)",
+      "Bash(node --version)",
+      "Bash(test *)",
+      "Bash(export PATH=*)",
+      "Bash(echo *)",
+      "Bash(ls *)",
+      "Bash(cd *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f \".claude/test-passed.txt\" ] && [ -f \".claude/quality-passed.txt\" ] && grep -q \"PASSED\" \".claude/test-passed.txt\" 2>/dev/null && grep -q \"PASSED\" \".claude/quality-passed.txt\" 2>/dev/null; then rm -f \".claude/test-passed.txt\" \".claude/quality-passed.txt\"; echo '{\"continue\":true}'; else echo '{\"continue\":false,\"stopReason\":\"🚫 推送被阻止：请先运行 gitee-agent 通过测试和质量检查\"}'; fi",
+            "if": "Bash(git push *)"
+          }
+        ]
+      }
     ]
   }
 }
