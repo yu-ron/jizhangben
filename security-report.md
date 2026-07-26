@@ -1,77 +1,49 @@
 # 安全检查报告
 
-**时间**：2026-07-26 20:54
+**时间**：2026-07-26 21:18
 **扫描范围**：src/ + 配置文件 + 依赖审计
 
 ## 总览
 
 | 类别 | 发现数 | 严重度 |
 |------|--------|--------|
-| 硬编码敏感信息 | 0 | ✅ 无 |
-| 注入漏洞 | 0 | ✅ 无 |
-| 配置文件泄露 | 0 | ✅ 项目内无 |
-| XSS 风险 | 0 | ✅ 无 |
-| 其他隐患 | 0 | ✅ 无 |
-| 依赖漏洞 | 4 | 🟡 中高危 |
+| 硬编码敏感信息 | 0 | - |
+| 注入漏洞（XSS/命令/SQL） | 0 | - |
+| 配置文件泄露 | 0 | - |
+| 弱加密算法 | 0 | - |
+| HTTP 明文传输 | 0 | - |
+| 调试信息泄露 | 0 | - |
+| 依赖已知漏洞 | 4 | 🟡 |
 
 ## 详细发现
 
-### ✅ 项目源码安全
+### 🔴 严重
 
-对 `src/` 下所有 .ts/.tsx 文件进行了全面扫描，结果如下：
+无。
 
-| 检查项 | 扫描模式 | 结果 |
-|--------|---------|------|
-| 硬编码密码/密钥/Token | `password\|secret\|token\|apiKey\|api_key\|privateKey` | 0 处命中 |
-| XSS（跨站脚本） | `dangerouslySetInnerHTML\|document.write\|innerHTML=` | 0 处命中 |
-| 命令注入 | `exec\|execSync\|spawn\|eval(` | 0 处命中 |
-| Eval 动态执行 | `eval\|Function(` | 0 处命中 |
-| HTTP 明文 URL | `http://` | 0 处命中（仅 localhost 开发服务器） |
-| 弱加密算法 | `MD5\|SHA1\|DES` | 0 处命中 |
-| 调试日志泄露 | `console.log` | 0 处命中 |
+### 🟡 警告
 
-**评价**：本项目是纯前端记账应用，数据存储在浏览器 localStorage 中，无后端 API 调用，无网络传输。代码层面安全性良好。
+| 依赖 | 版本范围 | 严重程度 | 说明 |
+|------|---------|---------|------|
+| react-router | 6.0.0 - 7.17.0 | moderate | 开放重定向：反斜杠绕过 (CVE-2025-68470 bypass) |
+| react-router | 6.0.0 - 7.17.0 | moderate | SSR Hydration 中的任意构造器注入 |
+| react-router | 6.0.0 - 7.17.0 | moderate/high | 合计 4 个漏洞（3 moderate + 1 high） |
 
-### ✅ 配置文件安全
+**影响评估**：本项目为纯前端应用，无 SSR，不涉及服务端渲染。react-router 的 SSR 相关漏洞对本项目无实际影响。开放重定向漏洞在客户端 SPA 中风险较低。建议运行 `npm audit fix` 升级依赖即可。
 
-- 项目目录下无 `.env`、`.env.local`、`.env.production` 等环境变量文件
-- `.claude/settings.local.json` 仅包含 Claude Code 的权限和白名单配置，无敏感信息
+## 检查明细
 
-### 🟡 依赖漏洞
-
-运行 `npm audit` 结果：
-
-```
-4 vulnerabilities (3 moderate, 1 high)
-
-esbuild <=0.24.2 (moderate)
-  → 影响：开发服务器可能被同网络下其他网站访问
-  → 仅影响本地开发环境，不影响生产构建
-  → 修复需升级 vite 到 v8（破坏性变更）
-
-react-router 6.0.0-7.17.0 (moderate × 2 + high × 1)
-  → CVE-2025-68470 bypass：开放重定向
-  → GHSA-337j：SSR hydration 时反序列化构造器注入
-  → 本项目未使用 SSR，第二项不受影响
-  → 可用 npm audit fix 升级 react-router 到 7.18.0
-```
-
-### 🔴 上次检查遗留问题（2026-07-23）
-
-上次检查发现的 `~/.claude/settings.json` 中的 `ANTHROPIC_AUTH_TOKEN` 明文密钥问题已于上次修复时解决，本次检查确认当前 `.claude/settings.local.json` 中 **不再包含** 任何密钥或 Token。
-
-## 安全评分
-
-| 维度 | 评分 | 说明 |
-|------|------|------|
-| 源码安全 | 5.0/5 | 无硬编码密钥、无注入、无 XSS |
-| 配置安全 | 5.0/5 | 项目内无敏感配置文件 |
-| 依赖安全 | 3.5/5 | 4 个已知漏洞，其中 1 个高危（SSR 相关，本项目不受影响） |
-
-**综合评分**：4.5/5（良好）
+| 检查项 | 结果 | 备注 |
+|--------|------|------|
+| 硬编码密钥/密码/Token | 通过 | `beginPath` 匹配为 Canvas API 误报 |
+| XSS（dangerouslySetInnerHTML 等） | 通过 | 未使用 |
+| 命令注入（exec/spawn/eval） | 通过 | 未使用 |
+| 敏感配置文件（.env 等） | 通过 | 项目无敏感配置文件 |
+| 弱加密（MD5/SHA1/DES） | 通过 | 未使用 |
+| HTTP 明文 URL | 通过 | 仅有 SVG namespace 声明（误报） |
+| console.log 调试信息 | 通过 | 源码中无残留 console.log |
 
 ## 建议
 
-1. **可选**：运行 `npm audit fix` 升级 react-router 到安全版本（非破坏性变更）
-2. **暂缓**：esbuild 漏洞仅影响本地开发环境，且修复需要 Vite 大版本升级，可等正式发布后再处理
-3. **持续**：每次发布前运行安全扫描，保持当前的良好状态
+1. 运行 `npm audit fix` 升级 react-router 以消除已知漏洞
+2. 本项目为纯本地存储应用，无网络请求和用户认证，整体安全风险极低
