@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if [ -f \".claude/test-passed.txt\" ] && [ -f \".claude/quality-passed.txt\" ] && grep -q \"PASSED\" \".claude/test-passed.txt\" 2>/dev/null && grep -q \"PASSED\" \".claude/quality-passed.txt\" 2>/dev/null; then rm -f \".claude/test-passed.txt\" \".claude/quality-passed.txt\"; echo '{\"continue\":true}'; else echo '{\"continue\":false,\"stopReason\":\"🚫 推送被阻止：请先运行 gitee-agent 通过测试和质量检查\"}'; fi",
+            "command": "if [ -f \".claude/test-passed.txt\" ] && [ -f \".claude/quality-passed.txt\" ] && grep -q \"PASSED\" \".claude/test-passed.txt\" 2>/dev/null && grep -q \"PASSED\" \".claude/quality-passed.txt\" 2>/dev/null; then rm -f \".claude/test-passed.txt\" \".claude/quality-passed.txt\"; echo '{\"continue\":true}'; else echo '{\"continue\":false,\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"请先运行 gitee-agent 通过测试和质量检查\"}}'; fi",
             "if": "Bash(git push *)"
           }
         ]

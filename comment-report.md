@@ -1,83 +1,61 @@
-# 📝 注释检查报告
+# 注释检查报告
 
-**时间**：2026-07-23 17:08
+**时间**：2026-07-26 20:52
 **扫描范围**：src/（排除 __tests__）
 
 ## 总览
 
 | 指标 | 数值 |
 |------|------|
-| 扫描文件数 | 13 |
-| 检查函数/逻辑块数 | 42 |
-| 缺失注释 🔴 | 22 |
-| 注释不足 🟡 | 6 |
-| 合格 🟢 | 14 |
+| 扫描文件数 | 12（main.tsx 为入口文件无自定义函数，不计数） |
+| 检查函数/逻辑块数 | 52 |
+| 缺失注释 🔴 | 2 |
+| 注释不足 🟡 | 9 |
+| 合格 🟢 | 41 |
 
 ## 缺失注释 🔴
 
-### src/utils/storage.ts（核心工具层，问题最多）
+### SnakeGame.tsx
 
 | 行号 | 函数/代码 | 问题 |
 |------|----------|------|
-| 55 | `function read<T>(key, fallback)` | 无注释。通用泛型函数，参数含义不直观（fallback 是什么？） |
-| 64 | `function write<T>(key, data)` | 无注释。数据写入逻辑，需说明格式（JSON.stringify） |
-| 70 | `export function getRecords()` | 无注释。导出函数，未说明返回值和来源 |
-| 74 | `export function saveRecords(records)` | 无注释 |
-| 78 | `export function addRecord(record)` | 无注释。关键的 CRUD 操作 |
-| 85 | `export function deleteRecord(id)` | 无注释 |
-| 93 | `export function getCategories()` | 无注释。内部有首次初始化逻辑，未在函数级说明 |
-| 104 | `export function saveCategories(categories)` | 无注释 |
-| 110 | `export function getBudget()` | 无注释 |
-| 114 | `export function saveBudget(budget)` | 无注释 |
-
-### src/store/AppContext.tsx（全局状态，逻辑复杂）
-
-| 行号 | 函数/代码 | 问题 |
-|------|----------|------|
-| 31 | `export function AppProvider()` | 无注释。整个应用的状态管理中心 |
-| 84 | `getCategoryExpenseData` | 无注释。复杂逻辑：分组→排序→配色→输出，需解释每一步 |
-| 99 | `getMonthTrend` | 无注释。`month.slice(5)` 为什么取后两位？不直观 |
-| 118 | `export function useApp()` | 无注释。自定义 Hook，未说明必须包在 AppProvider 内使用 |
-
-### src/components/
-
-| 文件 | 行号 | 函数 | 问题 |
-|------|------|------|------|
-| AddRecordModal.tsx | 11 | `AddRecordModal` | 无注释。弹窗组件，未说明 props 含义 |
-| BudgetBar.tsx | 4 | `BudgetBar` | 无注释。预算进度条，百分比的边界处理未说明 |
-| MonthPicker.tsx | 6 | `MonthPicker` | 无注释。月份选择器，日期计算逻辑未说明 |
-| Layout.tsx | 11 | `Layout` | 无注释。布局组件，未说明底部导航和内容区的关系 |
-
-### src/pages/
-
-| 文件 | 行号 | 函数 | 问题 |
-|------|------|------|------|
-| Home.tsx | 6 | `Home` | 无注释。首页组件 |
-| Home.tsx | 80 | `RecentRecords` | 无注释 |
-| Records.tsx | 6 | `Records` | 无注释 |
-| Settings.tsx | 7 | `Settings` | 无注释 |
-| Settings.tsx | 175 | `CategoryRow` | 无注释 |
-| Statistics.tsx | 6 | `Statistics` | 无注释 |
-| App.tsx | 9 | `App` | 无注释。路由配置入口 |
+| 79 | `export default function SnakeGame()` | 默认导出的主组件，包含 Canvas 游戏循环、键盘事件、触摸滑动、开始/暂停/结束等完整游戏逻辑，无 JSDoc 或描述性注释 |
+| 305 | `function drawGameOver()` | 在 Canvas 上绘制"游戏结束"半透明遮罩和文字，含 50ms 延迟与防抖机制（gameOverTimerRef），无任何注释说明绘制内容和防抖设计 |
 
 ## 注释不足 🟡
 
-| 文件 | 行号 | 函数 | 现有注释 | 问题 |
-|------|------|------|----------|------|
-| AppContext.tsx | 37 | `// ===== 记录操作 =====` | 分隔注释 | 只标了"是什么模块"，没解释每个函数做什么 |
-| AppContext.tsx | 49 | `// ===== 分类操作 =====` | 同上 | 同上 |
-| AppContext.tsx | 63 | `// ===== 预算操作 =====` | 同上 | 同上 |
-| AppContext.tsx | 71 | `// ===== 计算 =====` | 同上 | 同上，且计算逻辑复杂，应逐个函数注释 |
-| AddRecordModal.tsx | 25 | `handleSubmit` | `// 重置表单` | 只注释了清理部分，没说前面的校验逻辑 |
-| Statistics.tsx | 15 | `trendMonths` | 无单独注释 | 日期循环生成近 6 月列表，移月逻辑容易搞混 |
+### SnakeGame.tsx
+
+| 行号 | 函数/代码 | 现有注释 | 问题 |
+|------|----------|---------|------|
+| 97 | `draw()` | 上方有分区注释 `// ========== 绘制函数 ==========` | 分区注释不等同于函数注释，缺少对绘制内容的说明（画布清空、背景、网格线、食物闪烁效果、蛇头/蛇身/蛇眼渲染、暂停遮罩） |
+| 235 | `tick()` | 上方有分区注释 `// ========== 游戏主循环 ==========` | 缺少对核心循环逻辑的说明：缓冲方向应用、撞墙/撞自己检测、吃食物成长与加速、setTimeout 递归调度 |
+| 296 | `endGame()` | 上方有分区注释 `// ========== 游戏结束 ==========` | 缺少说明：清除游戏定时器、设置 gameOver 状态、触发结束画面延迟绘制 |
+| 330 | `startGame()` | 上方有分区注释 `// ========== 开始 / 重新开始 ==========` | 缺少说明：初始化蛇/食物/方向/速度、重置状态（score/gameOver/paused/started）、清理旧定时器、启动新游戏循环 |
+| 357 | `togglePause()` | 上方有分区注释 `// ========== 暂停 / 继续 ==========` | 缺少说明：切换 paused 状态、清除或恢复游戏定时器、重绘画布以叠加/移除暂停遮罩 |
+| 407 | `handleTouchStart()` | 上方有分区注释 `// ========== 触摸滑动支持 ==========` | 缺少说明：记录触摸起始坐标到 touchStartRef，后续由 handleTouchEnd 计算滑动方向 |
+| 412 | `handleTouchEnd()` | 同上分区注释 | 缺少说明：计算滑动距离和方向、20px 最小滑动距离过滤误触（minSwipe）、更新 nextDirRef |
+
+### Settings.tsx
+
+| 行号 | 函数/代码 | 现有注释 | 问题 |
+|------|----------|---------|------|
+| 24 | `handleAddCategory()` | 无 | 校验分类名称非空 → 调用 addCategory → 重置表单字段 → 关闭弹窗。逻辑清晰但作为事件处理函数缺少职责说明 |
+| 32 | `handleSaveBudget()` | 无 | 校验金额 > 0 → 保存预算 → 显示"已保存"反馈 2 秒后自动消失。缺少对完整交互流程的说明 |
 
 ## 合格示例 🟢
 
-| 文件 | 函数 | 说明 |
+| 文件 | 函数 | 评语 |
 |------|------|------|
-| storage.ts | `genId()` | ✅ `/** 生成唯一 ID */` JSDoc 风格 |
-| storage.ts | `getCurrentMonth()` | ✅ `/** 获取当前月份字符串 YYYY-MM */` |
-| SnakeGame.tsx | `randomFood()` | ✅ `/** 生成随机食物位置，不能和蛇身重叠 */` |
-| SnakeGame.tsx | `initialSnake()` | ✅ `/** 初始蛇：中间偏左，长度 3 */` |
-| SnakeGame.tsx | 各区段 | ✅ `// ========== xxx ==========` 清晰的分隔注释 |
-| SnakeGame.tsx | 核心逻辑 | ✅ 如 `// 应用缓冲方向（防止反向自杀）` |
+| storage.ts | 全部 12 个函数 | 每个函数都有 JSDoc 风格注释，清晰说明用途、参数和返回值 |
+| AppContext.tsx | AppProvider, useApp 及全部内部函数 | JSDoc 完整，复杂函数（getCategoryExpenseData、getMonthTrend）含 @param/@returns |
+| AddRecordModal.tsx | AddRecordModal, handleSubmit | JSDoc 含 @param，handleSubmit 解释了校验流程和重置逻辑 |
+| BudgetBar.tsx | BudgetBar | JSDoc 说明了百分比计算和颜色动态变化规则 |
+| Layout.tsx | Layout | JSDoc 说明了底部 5 个 tab 导航和内容区布局 |
+| MonthPicker.tsx | MonthPicker, prevMonth, nextMonth, isCurrentMonth | 每个函数都有注释，prevMonth 说明了跨年处理的 Date 技巧 |
+| Home.tsx | Home, RecentRecords | JSDoc 描述了仪表盘各区块 |
+| Records.tsx | Records, weekDay | JSDoc + weekDay 注释完整 |
+| Statistics.tsx | Statistics, trendMonths | JSDoc + 关键逻辑内联注释 |
+| Settings.tsx | Settings, CategoryRow | 主组件和子组件都有注释 |
+| App.tsx | App | JSDoc 描述了 5 个路由页面 |
+| SnakeGame.tsx | randomFood, initialSnake | JSDoc + 核心逻辑内联注释，randomFood 中的防死循环兜底机制注释清晰 |
