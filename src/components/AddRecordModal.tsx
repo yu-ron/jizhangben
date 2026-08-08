@@ -52,12 +52,12 @@ export default function AddRecordModal({ open, onClose }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center max-w-[480px] mx-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* 遮罩层 */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
-      {/* 弹窗内容 */}
-      <div className="relative w-full bg-white rounded-t-2xl p-5 animate-slide-up max-h-[90vh] overflow-y-auto">
+      {/* 弹窗内容——固定最大宽度，在桌面端居中显示 */}
+      <div className="relative w-full max-w-md bg-white rounded-2xl p-5 mx-4 max-h-[90vh] overflow-y-auto shadow-xl">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-800">记一笔</h2>
           <button onClick={onClose} className="text-gray-400 text-xl leading-none">&times;</button>

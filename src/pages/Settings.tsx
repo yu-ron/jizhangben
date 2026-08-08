@@ -111,9 +111,9 @@ export default function Settings() {
 
       {/* ===== 添加分类弹窗 ===== */}
       {showAddCat && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center max-w-[480px] mx-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowAddCat(false)} />
-          <div className="relative w-full bg-white rounded-t-2xl p-5">
+          <div className="relative w-full max-w-md bg-white rounded-2xl p-5 mx-4 shadow-xl">
             <h3 className="text-lg font-bold text-gray-800 mb-4">
               添加{newCatType === 'expense' ? '支出' : '收入'}分类
             </h3>

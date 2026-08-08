@@ -9,36 +9,46 @@ const navItems = [
 ];
 
 /**
- * 应用主布局——底部固定导航栏 + 内容区
- * 底部 5 个 tab：首页、账单、统计、设置、贪吃蛇
+ * 应用主布局——顶部导航栏 + 内容区（传统网站风格）
  */
 export default function Layout() {
   return (
-    <div className="min-h-screen pb-20 bg-gray-50">
-      <main className="px-4 pt-4">
-        <Outlet />
-      </main>
+    <div className="min-h-screen bg-gray-50">
+      {/* 顶部导航栏 */}
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-6xl mx-auto flex items-center justify-between h-14 px-6">
+          {/* Logo */}
+          <NavLink to="/" className="text-lg font-bold text-gray-800 flex items-center gap-2">
+            📒 记账本
+          </NavLink>
 
-      {/* 底部导航栏 */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-[800px] mx-auto bg-white border-t border-gray-200 safe-area-bottom">
-        <div className="flex justify-around items-center h-16">
-          {navItems.map(item => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-                  isActive ? 'text-primary-600' : 'text-gray-400 hover:text-gray-600'
-                }`
-              }
-            >
-              <span className="text-xl">{item.icon}</span>
-              <span className="text-xs font-medium">{item.label}</span>
-            </NavLink>
-          ))}
+          {/* 导航链接 */}
+          <div className="flex items-center gap-1">
+            {navItems.map(item => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) =>
+                  `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-primary-50 text-primary-600'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  }`
+                }
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
         </div>
       </nav>
+
+      {/* 内容区 */}
+      <main className="max-w-6xl mx-auto px-6 py-6">
+        <Outlet />
+      </main>
     </div>
   );
 }
